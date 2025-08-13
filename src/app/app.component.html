@@ -1,0 +1,10 @@
+<div class="flex h-screen">
+    <app-sidebar [isOpen]="isSidebarOpen"></app-sidebar>
+
+    <div class="flex-1 h-full overflow-y-auto">
+        <app-topbar (toggleSidebar)="toggleSidebar()"></app-topbar>
+        <div class=" h-9/10">
+            <app-chat-window class="flex-1 overflow-hidden"></app-chat-window>
+        </div>
+    </div>
+</div>
