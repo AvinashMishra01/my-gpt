@@ -17,15 +17,15 @@ A modern AI chat application built with **HTML**, **Tailwind CSS (CDN)**, and **
   - Image rendering
   - Markdown and slide-like presentation
 - **Tailwind CDN:** No build setup required, super fast to start.
-- **Responsive Layout:** Optimized for desktop and mobile.
+
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** HTML, Tailwind CSS (via CDN), JavaScript
+- **Frontend:** Angular, Tailwind CSS (via CDN), JavaScript, TypeScript
 - **Icons:** Lucide / SVG-based
-- **AI Backend (Optional):** Connect with OpenAI or any other AI API
+
 
 ---
 
@@ -40,3 +40,4 @@ A modern AI chat application built with **HTML**, **Tailwind CSS (CDN)**, and **
    cd ai-chat-ui
    npm i --f
    ng s -o 
+
