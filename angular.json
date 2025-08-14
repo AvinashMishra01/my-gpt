@@ -24,12 +24,16 @@
               {
                 "glob": "**/*",
                 "input": "public"
+                
               }
+        
             ],
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+                "node_modules/monaco-editor/min/vs/loader.js"
+            ]
           },
           "configurations": {
             "production": {
