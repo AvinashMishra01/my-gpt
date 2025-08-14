@@ -1,59 +1,42 @@
-# AiChatUi
+# AI-Powered Contextual Chat Interface
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+A modern AI chat application built with **HTML**, **Tailwind CSS (CDN)**, and **JavaScript**, featuring:
+- A collapsible sidebar
+- Responsive chat interface
+- Dynamic output panel for rendering **code blocks**, **tables**, **images**, and **Markdown/slides**.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Features
 
-```bash
-ng serve
-```
+- **Collapsible Sidebar:** Toggle between expanded and collapsed states for better focus.
+- **Chat Interface:** Clean, minimal, and responsive design for smooth AI interactions.
+- **Contextual Output Rendering:**
+  - Code formatting with syntax highlighting
+  - Table display
+  - Image rendering
+  - Markdown and slide-like presentation
+- **Tailwind CDN:** No build setup required, super fast to start.
+- **Responsive Layout:** Optimized for desktop and mobile.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 🛠️ Tech Stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Frontend:** HTML, Tailwind CSS (via CDN), JavaScript
+- **Icons:** Lucide / SVG-based
+- **AI Backend (Optional):** Connect with OpenAI or any other AI API
 
-```bash
-ng generate component component-name
-```
+---
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## ⚙️ Setup & Run
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/AvinashMishra01/my-gpt.git
+   cd ai-chat-ui
+   npm i --f
+   ng s -o 
