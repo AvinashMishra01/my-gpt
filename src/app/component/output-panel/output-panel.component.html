@@ -1,33 +1,36 @@
 
 
 <div class="p-4 space-y-4 overflow-auto">
-  <div *ngFor="let block of outputData">
+  @for (block of outputData; track $index) {
     <ng-container [ngSwitch]="block.type">
 
-      <!-- Code Block -->
+ 
       <pre *ngSwitchCase="'code'" class="bg-gray-900 text-white p-3 rounded overflow-x-auto">
         <code>{{ block.content }}</code>
       </pre>
 
-      <!-- Table -->
+  
       <table *ngSwitchCase="'table'" class="table-auto border border-gray-300 w-full text-sm">
         <thead>
           <tr>
-            <th *ngFor="let header of block.headers" class="border p-2 bg-gray-100">{{ header }}</th>
+            @for (header of block.headers; track $index) {
+            <th  class="border p-2 bg-gray-100">{{ header }}</th>
+          }
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of block.rows">
+          @for ( row of block.rows; track $index) {
+          <tr>
             <td *ngFor="let cell of row" class="border p-2">{{ cell }}</td>
           </tr>
+        }
         </tbody>
       </table>
 
-      <!-- Image -->
       <img *ngSwitchCase="'image'" [src]="block.content" class="rounded max-w-full h-auto" alt="output image" />
 
-      <!-- Markdown -->
+  
       <div *ngSwitchCase="'markdown'" [innerHTML]="renderMarkdown(block.content||'')"></div>
     </ng-container>
-  </div>
+   }
 </div>

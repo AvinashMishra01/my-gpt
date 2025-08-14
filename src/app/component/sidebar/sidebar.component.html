@@ -1,36 +1,57 @@
-<!-- <div class="h-screen w-64 bg-gray-800 text-white p-4">
-  <h2 class="text-xl font-bold mb-6">Sidebar</h2>
-  <ul>
-    <li class="mb-2 hover:bg-gray-700 p-2 rounded cursor-pointer">Dashboard</li>
-    <li class="mb-2 hover:bg-gray-700 p-2 rounded cursor-pointer">Settings</li>
-    <li class="mb-2 hover:bg-gray-700 p-2 rounded cursor-pointer">Profile</li>
-  </ul>
-</div> -->
-<!-- <div class="h-screen w-64 bg-gray-900 text-white p-4 space-y-4">
-  <div class="text-xl font-bold">Menu</div>
-  <ul>
-    <li class="hover:bg-gray-700 p-2 rounded">Dashboard</li>
-    <li class="hover:bg-gray-700 p-2 rounded">Settings</li>
-    <li class="hover:bg-gray-700 p-2 rounded">Logout</li>
-  </ul>
-</div> -->
-
-<div [ngClass]="{
-  'w-64': isOpen,
-  'w-16': !isOpen
-}" class="bg-gray-900 text-white h-full transition-all duration-300 overflow-hidden">
-
-  <div class="p-4">
-    <p *ngIf="isOpen">Home</p>
-    <p *ngIf="isOpen">Chats</p>
-    <p *ngIf="isOpen">Settings</p>
-    <p *ngIf="!isOpen">H</p>
-    <p *ngIf="!isOpen">C</p>
-    <p *ngIf="!isOpen">S</p>
+<div 
+  [ngClass]="{
+    'w-64': isOpen,
+    'w-16': !isOpen
+  }"
+  class="bg-gray-900 text-white h-full flex flex-col transition-all duration-300 overflow-hidden"
+>
+  <!-- Profile section -->
+  <div class="flex items-center p-3 bg-gray-800 text-white rounded-b-lg">
+    <img 
+      [src]="userProfile.avatarUrl" 
+      alt="User Avatar" 
+      [title]="userProfile.name"
+      class="w-10 h-10 rounded-full border-2 border-gray-400"
+    >
+    @if (isOpen) {
+      <div class="flex flex-col ms-3">
+        <span class="font-semibold">{{ userProfile.name }}</span>
+        <span class="text-xs text-gray-300">{{ userProfile.role }}</span>
+      </div>
+    }
   </div>
+
+  <!-- "Chats" label -->
+<div class="flex items-center justify-between px-2 mb-1" *ngIf="isOpen">
+  <p class="text-gray-50 text-xs">Chats</p>
+
+  <button (click)="loadChatHistory()" class="mr-2 cursor-pointer" title="Refresh">
+    🔄
+  </button>
 </div>
 
 
-
-
-
+  <!-- Scrollable Chat List -->
+  <div class="flex-1 overflow-y-auto">
+    @if (isOpen) {
+      @for (group of chatHistoryGrouped; track $index) {
+        <div class="mb-3 p-2">
+          <p class="text-gray-400 text-xs mb-1">{{ group.date }}</p>
+          <ul>
+            @for (msg of group.messages; track $index) {
+              <li 
+                  class="cursor-pointer hover:bg-gray-700 p-1 rounded text-sm truncate"
+                  [title]="msg.userMessage.output[0].content"
+                  (click)="loadHistory(msg)">   
+                <span>{{ msg.userMessage.output[0].content }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    }
+    @else if(isOpen && chatHistoryGrouped.length==0 ) {
+      <div class="p-2">Search Something....</div>
+    }
+  </div>
+</div>

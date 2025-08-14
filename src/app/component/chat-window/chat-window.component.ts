@@ -1,8 +1,10 @@
 import { CommonModule, NgFor } from '@angular/common';
-import { Component, OnInit, output } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OutputPanelComponent } from '../output-panel/output-panel.component';
 import { ChatServiceService } from '../../service/chat-service.service';
+import { ChatMessage, ChatSession, OutputBlock,ChatHistorySession } from '../../model/chat-history-modae';
+import { HistoryService } from '../../service/history-Service/history.service';
 
 @Component({
   selector: 'app-chat-window',
@@ -11,121 +13,97 @@ import { ChatServiceService } from '../../service/chat-service.service';
   styleUrl: './chat-window.component.css'
 })
 export class ChatWindowComponent implements OnInit {
-messages: {from:string, output:any}[] = [
-//   {
-//     from: 'bot',
-//     output: {
-//       type: 'text',
-//       content: 'Hi! How can I assist you today?'
-//     }
-//   },
-//   {
-//     from: 'user',
-//     output: {
-//       type: 'text',
-//       content: 'Can you show me a JavaScript example of a Promise?'
-//     }
-//   },
-//   {
-//     from: 'bot',
-//     output: {
-//       type: 'code',
-//       language: 'javascript',
-//       content: `const myPromise = new Promise((resolve, reject) => {
-//   setTimeout(() => {
-//     resolve("Success!");
-//   }, 1000);
-// });
+messages: ChatMessage[] = []
+chatHistory: ChatHistorySession[] = [];
 
-// myPromise.then(result => console.log(result));`
-//     }
-//   },
-//   {
-//     from: 'user',
-//     output: {
-//       type: 'text',
-//       content: 'Do you have a reference table for HTTP status codes?'
-//     }
-//   },
-//   {
-//     from: 'bot',
-//     output: {
-//       type: 'table',
-//       content: {
-//         headers: ['Code', 'Description'],
-//         rows: [
-//           ['200', 'OK'],
-//           ['404', 'Not Found'],
-//           ['500', 'Internal Server Error']
-//         ]
-//       }
-//     }
-//   },
-//   {
-//     from: 'user',
-//     output: {
-//       type: 'text',
-//       content: 'Show me the architecture diagram.'
-//     }
-//   },
-//   {
-//     from: 'bot',
-//     output: {
-//       type: 'image',
-//       content: 'https://picsum.photos/id/237/200/300'
-//     }
-//   },
-//   {
-//     from: 'user',
-//     output: {
-//       type: 'text',
-//       content: 'Give me a slide summary for REST vs GraphQL.'
-//     }
-//   },
-//   {
-//     from: 'bot',
-//     output: {
-//       type: 'slide',
-//       content: [
-//         { title: 'REST', points: ['Fixed endpoints', 'Multiple requests'] },
-//         { title: 'GraphQL', points: ['Flexible queries', 'Single request'] }
-//       ]
-//     }
-//   }
-];
-
-constructor(private service : ChatServiceService){}
+constructor(private service : ChatServiceService, private chatHistoryService: HistoryService,private cdr: ChangeDetectorRef,){}
   newMessage = '';
+ loader:boolean=false;
+   @ViewChild('chatContainer') private chatContainer!: ElementRef;
 
-  ngOnInit(): void {
-    console.log("char component");
-    
+
+
+   private scrollToBottom(): void {
+    const container = this.chatContainer.nativeElement;
+    container.scrollTop = container.scrollHeight;
   }
+  ngOnInit(): void {
+
+
+
+    console.log("char component");
+       this.chatHistoryService.selectedEntry$.subscribe(entry => {
+      if (entry) {
+        // Replace messages array completely to trigger change detection
+        const newMessages = [entry.userMessage];
+        if (entry.botResponse) newMessages.push(entry.botResponse);
+        this.messages = [...newMessages];
+
+        // If using OnPush
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+    // if (entry) {
+    //   this.messages=[]
+    //   // Create a new array to trigger change detection
+    //   const newMessages = [entry.userMessage];
+    //   if (entry.botResponse) {
+    //     newMessages.push(entry.botResponse);
+    //   }
+    //   this.messages = [...newMessages]; // important: spread into a new array
+    // }
+ 
   
   sendMessage() {
   if (!this.newMessage.trim()) return;
 
-    this.messages.push({
-    from: 'user',
-    output: [
+  this.loader=true;
+      const userMessage: ChatMessage = {
+      from: 'user',
+       output: [
       { type: 'markdown', content: this.newMessage, from:'user' }
-    ]
-  });
-    this.service.getData(this.newMessage).subscribe({
+    ],
+      timestamp: new Date().toISOString()
+    };
+  //   this.messages.push({
+  //   from: 'user',
+  //   output: [
+  //     { type: 'markdown', content: this.newMessage, from:'user' }
+  //   ],
+  //   timestamp: new Date()
+  // });
+    // this.saveToHistory(userMessage);
+    this.messages.push(userMessage)
+    this.newMessage = "";
+    this.service.getData(userMessage.output[0].content).subscribe({
       next:(res:any)=>{
+        this.loader=false;
 console.log("succes is ", res);
  const rawContent = res?.choices?.[0]?.message?.content || '';
     const parsedBlocks = this.parseGroqOutput(rawContent);
     console.log("parse data is ",parsedBlocks)
-    this.messages.push({
-      from: 'bot',
-      output: parsedBlocks
-    });
-   this.newMessage=''
+         const botMessage: ChatMessage = {
+        from: 'bot',
+        output: parsedBlocks as OutputBlock[],
+        timestamp: new Date().toISOString()
+      };
+    this.messages.push(botMessage);
+        // Save **both** messages to history
+      this.saveToHistory(userMessage,botMessage);
+      this.newMessage=''
+ 
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 0);
+
+
+
       },
       error:(err:any)=>{
         console.log("erro is ", err)
-        
+        this.loader=false;
     this.newMessage = "";
       }
     })
@@ -191,6 +169,28 @@ console.log("succes is ", res);
 
     return { type: 'table', headers, rows };
   }
+
+  saveToHistory(userMsg: ChatMessage, botMsg?: ChatMessage) {
+  const dateKey = userMsg.timestamp.split('T')[0];// "YYYY-MM-DD"
+  let session = this.chatHistory.find(s => s.date === dateKey);
+
+  const historyStr = localStorage.getItem('chatHistory');
+  let chatHistory: ChatHistorySession[] = historyStr ? JSON.parse(historyStr) : [];
+
+
+  if (!session) {
+    session = { date: userMsg.timestamp, messages: [] };
+   chatHistory.push(session);
+  }
+ session.messages.push({
+    userMessage: userMsg,
+    botResponse: botMsg
+  });
+
+  // persist
+  localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  this.chatHistory=chatHistory
+}
 
 
 }

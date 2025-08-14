@@ -1,27 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
-export interface OutputBlock {
-  type: 'markdown' | 'code' | 'image' | 'table';
-  from?:string;
-  content?: string;  
-  language?: string;      
-  headers?: string[]; 
-  rows?: string[][];  
-}
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { OutputBlock } from '../../model/chat-history-modae';
+
    @Component({
   selector: 'app-output-panel',
-  imports: [CommonModule],
+  imports: [CommonModule,FormsModule,MonacoEditorModule],
   templateUrl: './output-panel.component.html',
   styleUrl: './output-panel.component.css'
 })
 export class OutputPanelComponent implements OnInit {
 
   @Input() responseData : OutputBlock[]=[]
-
-
   outputData :OutputBlock[]=[]
+ previewHtml: string = ''; 
+
 
 constructor(private sanitizer: DomSanitizer){}
 
@@ -40,6 +36,10 @@ async ngOnInit() {
 renderMarkdown(mdText: string): SafeHtml {
     const html = marked.parse(mdText, { async: false }) as string;
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+    runCode(code: string) {
+    this.previewHtml = code;
   }
 
 
